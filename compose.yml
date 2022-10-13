@@ -1,0 +1,64 @@
+version: "3.9"
+
+services:
+  backend:
+    build: .
+    depends_on:
+      db:
+        condition: service_started
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/code
+    ports:
+      - "8000:8000"
+    environment:
+      DB_NAME: postgres
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_PORT: "5432"
+      DB_HOST: db
+      TZ: "Europe/Paris"
+      DEBUG: True
+      SECRET_KEY: xcYcyGcjfdUj
+      ALLOWED_HOSTS: "localhost"
+
+  db:
+    image: postgres:14
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      TZ: "Europe/Paris"
+      PGTZ: "Europe/Paris"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
+  pgadmin:
+    image: dpage/pgadmin4:6.7
+    environment:
+      PGADMIN_LISTEN_ADDRESS: pgadmin
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_DISABLE_POSTFIX: 1
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: "False"
+      PGADMIN_CONFIG_SHOW_GRAVATAR_IMAGE: "False"
+    ports:
+      - "5050:80"
+    entrypoint:
+      - "/bin/sh"
+      - "-c"
+      - >
+        /bin/echo -e '*:*:*:postgres:postgres' > /tmp/.pgpass && chmod 600 /tmp/.pgpass && /entrypoint.sh
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+      - ./config/pgadmin/servers.json:/pgadmin4/servers.json
+
+volumes:
+  db-data:
+  pgadmin-data:
