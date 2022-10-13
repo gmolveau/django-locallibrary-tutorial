@@ -1,8 +1,9 @@
 from django.shortcuts import render
 
+from .models import Author, Book, BookInstance, Genre
+
 # Create your views here.
 
-from .models import Book, Author, BookInstance, Genre
 
 
 def index(request):
@@ -81,11 +82,12 @@ class LoanedBooksAllListView(PermissionRequiredMixin, generic.ListView):
         return BookInstance.objects.filter(status__exact='o').order_by('due_back')
 
 
-from django.shortcuts import get_object_or_404
-from django.http import HttpResponseRedirect
-from django.urls import reverse
 import datetime
+
 from django.contrib.auth.decorators import login_required, permission_required
+from django.http import HttpResponseRedirect
+from django.shortcuts import get_object_or_404
+from django.urls import reverse
 
 # from .forms import RenewBookForm
 from catalog.forms import RenewBookForm
@@ -125,8 +127,9 @@ def renew_book_librarian(request, pk):
     return render(request, 'catalog/book_renew_librarian.html', context)
 
 
-from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
+from django.views.generic.edit import CreateView, DeleteView, UpdateView
+
 from .models import Author
 
 
@@ -166,3 +169,9 @@ class BookDelete(PermissionRequiredMixin, DeleteView):
     model = Book
     success_url = reverse_lazy('books')
     permission_required = 'catalog.can_mark_returned'
+
+from django.http import JsonResponse
+
+
+def api_view(request):
+    return JsonResponse({"foo": "bar"})

@@ -21,6 +21,10 @@ bootstrap:	## bootstrap application.
 	docker compose exec backend python3 manage.py createsuperuser
 # echo "from django.contrib.auth.models import User; User.objects.create_superuser('admin', 'admin@admin.com', 'admin')"
 
+.PHONY: logs
+logs: ## view backend logs
+	docker compose logs -ft backend
+
 .PHONY: help
 help: ## Show this help.
 	@echo "Usage:"
